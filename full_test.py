@@ -85,19 +85,19 @@ def generate_mock_report(market_data, qualified_stocks):
     return mock_report
 
 def send_mock_message(message):
-    """模擬發送 LINE 訊息"""
-    print("📱 模擬發送 LINE 訊息...")
+    """模擬發送 Discord 訊息"""
+    print("💬 模擬發送 Discord 訊息...")
     print("=" * 50)
     print("訊息內容預覽：")
     print(message)
     print("=" * 50)
-    print("✅ 模擬發送成功（實際使用時需要設定 LINE_ACCESS_TOKEN）")
+    print("✅ 模擬發送成功（實際使用時需要設定 DISCORD_WEBHOOK_URL）")
     return True
 
 def main():
     """主程式"""
     print("🚀 啟動測試模式早報機器人...")
-    print("本次測試不使用 Gemini API 與 LINE API")
+    print("本次測試不使用 Gemini API 與 Discord Webhook")
     print("=" * 60)
 
     try:
@@ -126,8 +126,7 @@ def main():
             print("\n🎉 測試完成！所有核心功能運作正常")
             print("\n📋 待設定項目：")
             print("   • GEMINI_API_KEY - 用於 AI 生成新聞分析")
-            print("   • LINE_ACCESS_TOKEN - 用於發送 LINE 訊息")
-            print("   • LINE_USER_ID - LINE 接收者 ID")
+            print("   • DISCORD_WEBHOOK_URL - 用於發送 Discord 訊息")
             print("\n💡 設定完成後即可正式使用！")
         else:
             print("❌ 模擬發送失敗")

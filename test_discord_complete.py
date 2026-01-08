@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-測試修改後的完整程式（LINE 格式優化版）
+測試修改後的完整程式（Discord Webhook 版）
 模擬完整流程但不使用真實 API
 """
 
@@ -50,13 +50,13 @@ def mock_gemini_generate(market_data, qualified_stocks):
 理由：基建需求回升加上綠色轉型，營運動能逐步改善
 
 ⚠️ 投資提醒
-本報告僅供參考，投資有風險請謹慎評估。"""
-
+本報告僅供參考，投資有風險請謹慎評估。
+"""
     return mock_ai_report
 
-def mock_send_line_message(message):
-    """模擬發送 LINE 訊息"""
-    print("📱 模擬 LINE 訊息發送")
+def mock_send_discord_message(message):
+    """模擬發送 Discord 訊息"""
+    print("💬 模擬 Discord 訊息發送")
     print("=" * 70)
     print("訊息內容:")
     print(message)
@@ -69,21 +69,22 @@ def mock_send_line_message(message):
     has_structure = "1." in message and "2." in message and "3." in message
 
     print(f"📏 訊息檢查:")
-    print(f"   長度: {length} 字元 {'✅' if length <= 5000 else '❌'}")
+    print(f"   長度: {length} 字元 {'✅' if length <= 2000 else '⚠️ 將分段發送'}")
     print(f"   包含 Emoji: {'✅' if has_emoji else '❌'}")
     print(f"   無 Markdown: {'✅' if no_markdown else '❌'}")
     print(f"   有結構編號: {'✅' if has_structure else '❌'}")
 
-    if length <= 5000 and has_emoji and no_markdown and has_structure:
-        print("✅ 訊息格式完全符合 LINE 要求")
+    # Discord 訊息可以分段發送，所以長度不是問題
+    if has_emoji and no_markdown and has_structure:
+        print("✅ 訊息格式完全符合 Discord 要求")
         return True
     else:
-        print("⚠️  訊息格式需要調整")
+        print("⚠️ 訊息格式需要調整")
         return False
 
 def run_complete_test():
     """運行完整測試"""
-    print("🚀 完整程式測試 - LINE 格式優化版")
+    print("🚀 完整程式測試 - Discord Webhook 版")
     print("=" * 70)
 
     try:
@@ -109,9 +110,9 @@ def run_complete_test():
 
         print("✅ 報告生成成功")
 
-        # 步驟 3: 模擬發送 LINE 訊息
-        print("\n📱 步驟 3: 發送 LINE 訊息...")
-        success = mock_send_line_message(report)
+        # 步驟 3: 模擬發送 Discord 訊息
+        print("\n💬 步驟 3: 發送 Discord 訊息...")
+        success = mock_send_discord_message(report)
 
         if not success:
             print("❌ 訊息發送格式檢查失敗")
@@ -119,26 +120,8 @@ def run_complete_test():
 
         print("✅ 訊息發送模擬成功")
 
-        return True
-
-    except Exception as e:
-        print(f"❌ 測試異常: {e}")
-        import traceback
-        traceback.print_exc()
-        return False
-
-def main():
-    print("🧪 股票早報機器人 - LINE 格式優化測試")
-    print("驗證移除 Markdown 並優化為 LINE 友好格式")
-    print("=" * 70)
-
-    success = run_complete_test()
-
-    print("\n" + "=" * 70)
-
-    if success:
         print("🎉 完整測試成功！")
-        print("\n📋 LINE 格式優化完成:")
+        print("\n📋 Discord 格式優化完成:")
         print("   ✅ 移除所有 Markdown 語法 (**、##、[])")
         print("   ✅ 使用 Emoji 美化排版 (🌅、📈、🎯)")
         print("   ✅ 採用數字編號結構 (1.、2.、3.)")
@@ -148,11 +131,34 @@ def main():
 
         print("\n🚀 程式已完全準備就緒:")
         print("   • 數據獲取功能穩定")
-        print("   • 訊息格式適合 LINE")
+        print("   • 訊息格式適合 Discord")
         print("   • 設定環境變數後即可使用")
         print("   • GitHub Actions 每日 08:30 自動執行")
-    else:
+
+        return True
+
+    except Exception as e:
+        print(f"❌ 測試異常: {e}")
+        return False
+
+def main():
+    print("🧪 股票早報機器人 - Discord Webhook 測試")
+    print("驗證移除 Markdown 並優化為 Discord 友好格式")
+    print("=" * 70)
+
+    success = run_complete_test()
+
+    if not success:
         print("❌ 測試失敗，請檢查程式")
+        return False
+
+    print("\n🎯 測試總結:")
+    print("   ✅ 市場數據獲取正常")
+    print("   ✅ AI 模擬報告生成成功")
+    print("   ✅ Discord 訊息格式檢查通過")
+    print("   ✅ 程式完全準備就緒")
+
+    return True
 
 if __name__ == "__main__":
     main()

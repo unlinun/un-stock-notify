@@ -11,8 +11,7 @@ def test_env_vars():
 
     required_vars = {
         'GEMINI_API_KEY': 'Gemini AI API 金鑰',
-        'LINE_ACCESS_TOKEN': 'LINE Bot 存取權杖',
-        'LINE_USER_ID': 'LINE 使用者 ID'
+        'DISCORD_WEBHOOK_URL': 'Discord Webhook URL'
     }
 
     results = {}

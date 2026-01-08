@@ -5,12 +5,11 @@ import yfinance as yf
 from google import genai
 from google.genai import types
 from google.genai.errors import ServerError
-from linebot import LineBotApi
-from linebot.models import TextSendMessage
+import requests
+import json
 
 # 1. 從環境變數讀取金鑰
-LINE_ACCESS_TOKEN = os.environ.get('LINE_ACCESS_TOKEN')
-LINE_USER_ID = os.environ.get('LINE_USER_ID')
+DISCORD_WEBHOOK_URL = os.environ.get('DISCORD_WEBHOOK_URL')
 GEMINI_API_KEY = os.environ.get('GEMINI_API_KEY')
 
 def get_taiwan_stock_pool():
@@ -177,7 +176,7 @@ def generate_report_with_retry(client, market_data, qualified_stocks, max_retrie
     - 不要使用任何 Markdown 語法 (如 **、##、[]() 等)
     - 使用 Emoji 和數字編號來美化排版
     - 每個段落間空一行提升可讀性
-    - 內容簡潔適合手機 LINE 閱讀
+    - 內容簡潔適合手機 Discord 閱讀
     - 使用繁體中文
     """
 
@@ -212,20 +211,52 @@ AI 新聞分析功能暫時無法使用，僅提供基本市場數據。
             return f"❌ 生成報告錯誤: {str(e)}"
     return None
 
-def send_line_message(message):
-    """發送 LINE 訊息 (保留原本的分割邏輯)"""
-    if not LINE_ACCESS_TOKEN or not LINE_USER_ID:
-        print("🚫 缺少金鑰，輸出內容：\n", message)
+def send_discord_message(message):
+    """使用 Webhook 發送 Discord 訊息"""
+    if not DISCORD_WEBHOOK_URL:
+        print("🚫 缺少 Discord Webhook URL，輸出內容：\n", message)
         return False
+
     try:
-        line_bot_api = LineBotApi(LINE_ACCESS_TOKEN)
-        max_length = 4500
-        for i in range(0, len(message), max_length):
-            line_bot_api.push_message(LINE_USER_ID, TextSendMessage(text=message[i:i+max_length]))
-            time.sleep(1)
+        # Discord 單則訊息限制為 2000 字元
+        max_length = 2000
+
+        # 如果訊息超過限制，分割發送
+        if len(message) <= max_length:
+            messages = [message]
+        else:
+            messages = []
+            for i in range(0, len(message), max_length):
+                messages.append(message[i:i+max_length])
+
+        # 發送每則訊息
+        for i, msg in enumerate(messages):
+            payload = {
+                "content": msg,
+                "username": "投資早報機器人",
+                "avatar_url": "https://cdn.discordapp.com/attachments/1234567890/robot.png"  # 可選：機器人頭像
+            }
+
+            response = requests.post(
+                DISCORD_WEBHOOK_URL,
+                json=payload,
+                headers={"Content-Type": "application/json"}
+            )
+
+            if response.status_code == 204:
+                print(f"✅ Discord 訊息 {i+1}/{len(messages)} 發送成功!")
+            else:
+                print(f"❌ Discord 訊息發送失敗: {response.status_code} - {response.text}")
+                return False
+
+            # 避免 rate limit，分批發送時稍作延遲
+            if len(messages) > 1 and i < len(messages) - 1:
+                time.sleep(0.5)
+
         return True
+
     except Exception as e:
-        print(f"❌ LINE 發送失敗: {e}")
+        print(f"❌ Discord 發送失敗: {e}")
         return False
 
 def main():
@@ -235,7 +266,7 @@ def main():
         market_data, qualified_stocks = get_market_data()
         report = generate_report_with_retry(client, market_data, qualified_stocks)
         if report:
-            send_line_message(report)
+            send_discord_message(report)
         print("🎉 任務完成!")
     except Exception as e:
         print(f"❌ 執行異常: {e}")

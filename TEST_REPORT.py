@@ -17,7 +17,7 @@ def print_test_report():
    • pandas: 成功
    • lxml: 成功
    • google-genai: 成功
-   • line-bot-sdk: 成功
+   • requests: 成功
 
 ✅ 2. 美股數據獲取
    • 道瓊指數 (^DJI): 正常
@@ -43,7 +43,7 @@ def print_test_report():
 
 ⚠️  6. API 服務（需要金鑰）
    • Gemini API: 需要 GEMINI_API_KEY
-   • LINE Bot API: 需要 LINE_ACCESS_TOKEN + LINE_USER_ID
+   • Discord Webhook: 需要 DISCORD_WEBHOOK_URL
 
 ✅ 7. GitHub Actions
    • Workflow 設定: 正常
@@ -64,20 +64,18 @@ def print_test_report():
 
 1. 設定 API 金鑰：
    • 取得 Gemini API Key
-   • 設定 LINE Bot Token
-   • 取得 LINE User ID
+   • 建立 Discord Webhook URL
 
 2. 環境變數設定：
    export GEMINI_API_KEY='your_gemini_key'
-   export LINE_ACCESS_TOKEN='your_line_token'
-   export LINE_USER_ID='your_line_user_id'
+   export DISCORD_WEBHOOK_URL='your_discord_webhook_url'
 
 3. 本地完整測試：
    python stock_bot.py
 
 4. GitHub Actions 設定：
    • 在 GitHub Repository Settings > Secrets 中
-   • 新增上述三個環境變數
+   • 新增上述兩個環境變數
 
 ================================================================
 
@@ -95,8 +93,10 @@ def print_test_report():
    • test_original.py: 原始函數測試
    • full_test.py: 完整流程模擬
    • test_env.py: 環境變數檢查
+   • test_discord_complete.py: Discord 完整測試
 
 執行 python test_env.py 可檢查環境變數設定狀況。
+執行 python test_discord_complete.py 可進行完整 Discord 功能測試。
 """
 
     print(report)

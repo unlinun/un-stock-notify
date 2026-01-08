@@ -38,9 +38,9 @@ def mock_generate_report(market_data, qualified_stocks):
 
     return mock_report
 
-def mock_send_line(message):
-    """模擬發送 LINE 訊息"""
-    print("📱 模擬發送 LINE 訊息:")
+def mock_send_discord(message):
+    """模擬發送 Discord 訊息"""
+    print("💬 模擬發送 Discord 訊息:")
     print("=" * 60)
     print(message)
     print("=" * 60)
@@ -75,8 +75,8 @@ def run_complete_simulation():
         print("✅ 報告生成成功")
 
         # 步驟 3: 發送訊息
-        print("\n📱 步驟 3: 發送 LINE 訊息...")
-        success = mock_send_line(report)
+        print("\n💬 步驟 3: 發送 Discord 訊息...")
+        success = mock_send_discord(report)
 
         if not success:
             print("❌ 訊息發送失敗")
