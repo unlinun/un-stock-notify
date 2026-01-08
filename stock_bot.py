@@ -2,6 +2,7 @@ import os
 import time
 import pandas as pd
 import yfinance as yf
+import requests
 from google import genai
 from google.genai import types
 from google.genai.errors import ServerError
@@ -9,6 +10,7 @@ from linebot import LineBotApi
 from linebot.models import TextSendMessage
 
 # 1. 從環境變數讀取金鑰
+DISCORD_WEBHOOK_URL = os.environ.get('DISCORD_WEBHOOK_URL')
 LINE_ACCESS_TOKEN = os.environ.get('LINE_ACCESS_TOKEN')
 LINE_USER_ID = os.environ.get('LINE_USER_ID')
 GEMINI_API_KEY = os.environ.get('GEMINI_API_KEY')
@@ -212,8 +214,26 @@ AI 新聞分析功能暫時無法使用，僅提供基本市場數據。
             return f"❌ 生成報告錯誤: {str(e)}"
     return None
 
+def send_discord_message(message):
+    """發送 Discord 訊息 """
+    if not DISCORD_WEBHOOK_URL:
+        return False
+    try:
+        # Discord 的長度限制是 2000 字
+        max_length = 1900
+        for i in range(0, len(message), max_length):
+            payload = {"content": message[i:i+max_length]}
+            response = requests.post(DISCORD_WEBHOOK_URL, json=payload)
+            if response.status_code not in [200, 204]:
+                print(f"❌ Discord 傳送失敗: {response.status_code}")
+            time.sleep(0.5) # 避免觸發速率限制
+        return True
+    except Exception as e:
+        print(f"❌ Discord 發送異常: {e}")
+        return False
+
 def send_line_message(message):
-    """發送 LINE 訊息 (保留原本的分割邏輯)"""
+    """發送 LINE 訊息 """
     if not LINE_ACCESS_TOKEN or not LINE_USER_ID:
         print("🚫 缺少金鑰，輸出內容：\n", message)
         return False
@@ -228,14 +248,38 @@ def send_line_message(message):
         print(f"❌ LINE 發送失敗: {e}")
         return False
 
+def notify_all(message):
+    """根據環境變數決定發送對象"""
+    sent_any = False
+
+    # 嘗試發送 LINE
+    if LINE_ACCESS_TOKEN and LINE_USER_ID:
+        if send_line_message(message):
+            print("✅ LINE 訊息已發送")
+            sent_any = True
+
+    # 嘗試發送 Discord
+    if DISCORD_WEBHOOK_URL:
+        if send_discord_message(message):
+            print("✅ Discord 訊息已發送")
+            sent_any = True
+
+    if not sent_any:
+        print("⚠️ 未設定任何通知管道，或發送皆失敗。內容如下：\n", message)
+
 def main():
     print("🚀 啟動早報機器人...")
     try:
+        # 你的金鑰讀取與初始化
         client = genai.Client(api_key=GEMINI_API_KEY)
+
+        # 抓取資料與生成報表
         market_data, qualified_stocks = get_market_data()
         report = generate_report_with_retry(client, market_data, qualified_stocks)
+
         if report:
-            send_line_message(report)
+            notify_all(report)
+
         print("🎉 任務完成!")
     except Exception as e:
         print(f"❌ 執行異常: {e}")

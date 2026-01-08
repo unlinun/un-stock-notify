@@ -3,3 +3,4 @@ pandas
 lxml
 google-genai
 line-bot-sdk
+requests

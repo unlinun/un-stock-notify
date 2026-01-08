@@ -1,0 +1,43 @@
+# Python 快取檔案
+__pycache__/
+*.py[cod]
+*$py.class
+
+# 虛擬環境
+venv/
+env/
+.venv/
+.env/
+
+# 環境變數檔案
+.env
+.env.local
+.env.*.local
+
+# IDE 設定檔案
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# 系統檔案
+.DS_Store
+Thumbs.db
+
+# 日誌檔案
+*.log
+logs/
+
+# 測試覆蓋率報告
+.coverage
+htmlcov/
+.pytest_cache/
+
+# 暫存檔案
+*.tmp
+*.temp
+temp/
+
+# 備份檔案
+*.bak
+*.backup
