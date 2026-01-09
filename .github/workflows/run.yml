@@ -1,6 +1,8 @@
 name: Stock Market Report
 
 on:
+  push:
+    branches: [ main ]  # 只要一推送到 main 就會立刻跑
   schedule:
     - cron: '30 0 * * *'  # 每天 UTC 00:30 (台北時間 08:30)
   workflow_dispatch:
